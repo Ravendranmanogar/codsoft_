@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // For date formatting
-import 'package:shared_preferences/shared_preferences.dart'; // For saving data
-import 'dart:convert'; // For JSON conversion
-//import 'package:flutter/scheduler.dart'; // For animation
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 void main() {
   runApp(MyApp());
@@ -25,7 +24,7 @@ class TodoListScreen extends StatefulWidget {
 
 class _TodoListScreenState extends State<TodoListScreen> with SingleTickerProviderStateMixin {
   List<Task> _tasks = [];
-  TextEditingController _taskController = TextEditingController();
+  final TextEditingController _taskController = TextEditingController();
   DateTime? _selectedDueDate;
   late AnimationController _blinkController;
   bool _shouldBlink = false;
@@ -35,11 +34,11 @@ class _TodoListScreenState extends State<TodoListScreen> with SingleTickerProvid
     super.initState();
     _loadTasks();
 
-    // Initialize the animation controller for the blinking effect
     _blinkController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500), // Total duration for blink cycle
+      duration: const Duration(milliseconds: 500),
     );
+
   }
 
   @override
@@ -49,7 +48,7 @@ class _TodoListScreenState extends State<TodoListScreen> with SingleTickerProvid
     super.dispose();
   }
 
-  // Load tasks from SharedPreferences
+
   void _loadTasks() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String>? savedTasks = prefs.getStringList('tasks');
@@ -60,14 +59,14 @@ class _TodoListScreenState extends State<TodoListScreen> with SingleTickerProvid
     }
   }
 
-  // Save tasks to SharedPreferences
+
   void _saveTasks() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     List<String> taskStrings = _tasks.map((task) => task.toJson()).toList();
     await prefs.setStringList('tasks', taskStrings);
   }
 
-  // Method to add task with a due date
+
   void _addTask(String taskTitle) {
     if (taskTitle.isNotEmpty && _selectedDueDate != null) {
       setState(() {
@@ -79,13 +78,13 @@ class _TodoListScreenState extends State<TodoListScreen> with SingleTickerProvid
             dueDate: _selectedDueDate!,
           ),
         );
-        _saveTasks(); // Save tasks after adding a new task
+        _saveTasks();
       });
       _taskController.clear();
       _selectedDueDate = null;
-      _shouldBlink = false; // Reset the blink effect if date is selected
+      _shouldBlink = false;
     } else if (_selectedDueDate == null) {
-      _triggerBlinkEffect(); // Trigger the blink if no due date is selected
+      _triggerBlinkEffect();
     }
   }
 
@@ -94,14 +93,13 @@ class _TodoListScreenState extends State<TodoListScreen> with SingleTickerProvid
     _shouldBlink = true;
     _blinkController.repeat(reverse: true);
 
-    // Stop the blinking after 3 blinks (3 * 500ms = 1.5s)
+
     Future.delayed(const Duration(milliseconds: 1500), () {
       _blinkController.stop();
       _shouldBlink = false;
     });
   }
 
-  // Method to delete task
   void _deleteTask(int index) {
     setState(() {
       _tasks.removeAt(index);
@@ -109,7 +107,6 @@ class _TodoListScreenState extends State<TodoListScreen> with SingleTickerProvid
     });
   }
 
-  // Method to edit task
   void _editTask(int index) {
     _taskController.text = _tasks[index].title;
     showDialog(
@@ -139,7 +136,6 @@ class _TodoListScreenState extends State<TodoListScreen> with SingleTickerProvid
     );
   }
 
-  // Method to toggle task completion status
   void _toggleTaskCompletion(int index) {
     setState(() {
       _tasks[index].isCompleted = !_tasks[index].isCompleted;
@@ -147,8 +143,6 @@ class _TodoListScreenState extends State<TodoListScreen> with SingleTickerProvid
     });
     _sortTasks();
   }
-
-  // Sort tasks: incomplete tasks on top, completed tasks below
   void _sortTasks() {
     setState(() {
       _tasks.sort((a, b) {
@@ -163,7 +157,6 @@ class _TodoListScreenState extends State<TodoListScreen> with SingleTickerProvid
     });
   }
 
-  // Method to pick a due date
   void _pickDueDate(BuildContext context) async {
     DateTime? picked = await showDatePicker(
       context: context,
@@ -182,7 +175,8 @@ class _TodoListScreenState extends State<TodoListScreen> with SingleTickerProvid
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("To-Do List"),
+        backgroundColor: Colors.blue,
+        title: const Text("To-Do List",style: TextStyle(fontSize: 25,color: Colors.white,fontWeight: FontWeight.bold),),
       ),
       body: Stack(
         children: [
@@ -199,7 +193,7 @@ class _TodoListScreenState extends State<TodoListScreen> with SingleTickerProvid
                   margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade200, // Grey background for task container
+                    color: Colors.grey.shade200,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: ListTile(
@@ -242,7 +236,6 @@ class _TodoListScreenState extends State<TodoListScreen> with SingleTickerProvid
               },
             ),
           ),
-          // Text field and due date picker at the bottom
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
